@@ -1,15 +1,16 @@
-require 'net/http'
-require 'net/https'
-
 module Apicall
-  def self.call(request)
+  require 'net/http'
+  require 'net/https'
+
+  def self.call(request, user =  Settings.github.user, token = Settings.github.token)
+    raise ArgumentError, "user and/or token are not present", nil if (!user || !token)
     begin
       github_payload = "/api/v2/json/#{request}"
       host = "github.com"
       port = "443"
 
       req = Net::HTTP::Get.new(github_payload)
-      req.basic_auth(@user+"/token",@token)
+      req.basic_auth(user+"/token",token)
       httpd = Net::HTTP.new(host, port)
       httpd.use_ssl = true
       response = httpd.request(req)
@@ -37,49 +38,27 @@ class Repository
   end
 
   def get_issues(state)
-    issues = Array.new
-    puts "issues/list/#{@owner}/#{@name}/#{state}"
-    raw_issues = api_call("issues/list/#{@owner}/#{@name}/#{state}")['issues']
-    if (raw_issues && (raw_issues.count > 0))
-      raw_issues.each do |issue|
-        issues << Issue.new(issue["title"], issue["user"], issue["labels"], issue["updated_at"], issue["number"], state, @name, @owner)
-      end
-    else
-      issues = nil
-    end
-    return issues
-  end
-
-  protected
-  def api_call(request)
-    begin
-      github_payload = "/api/v2/json/#{request}"
-      host = "github.com"
-      port = "443"
-
-      req = Net::HTTP::Get.new(github_payload)
-      req.basic_auth(@user+"/token",@token)
-      httpd = Net::HTTP.new(host, port)
-      httpd.use_ssl = true
-      response = httpd.request(req)
-      json_res = JSON.parse(response.body)
-      return json_res
-    rescue
-      "no result found"
+    issues = Apicall.call("issues/list/#{owner}/#{name}/#{state}")['issues']
+    issues_r = Array.new
+    issues.each do |issue|
+      Issue.new({:title => issue["title"], :user => issue["user"],
+        :labels => issue["labels"], :updated_at => issue["updated_at"],
+        :number => issue["number"], :state => issue["state"],
+        :repository => name, :repository_owner => owner})
     end
   end
 end
 
 class Issue
-  def initialize(title, user, labels, updated_at, number, state, repository, repository_owner)
-    @title = title
-    @user = user
-    @labels = labels
-    @updated_at = updated_at
-    @number = number
-    @state = state
-    @repository = repository
-    @repository_owner = repository_owner
+  def initialize(data)
+    @title = data[:title]
+    @user = data[:user]
+    @labels = data[:labels]
+    @updated_at = data[:updated_at]
+    @number = data[:number]
+    @state = data[:state]
+    @repository = data[:repository]
+    @repository_owner = data[:repository_owner]
   end
 
   def url
@@ -96,27 +75,27 @@ class Github
   end
 
   def user
-    self.api_call("user/show/#{@user}")
+    Apicall.call("user/show/#{@user}")
   end
 
   def organization
-    self.api_call("organizations/#{@organization}")
+    Apicall.call("organizations/#{@organization}")
   end
 
   def teams
-    self.api_call("organizations/#{@organization}/teams")
+    Apicall.call("organizations/#{@organization}/teams")
   end
 
   def all_accessible_repositories
-    self.api_call("organizations/repositories")
+    Apicall.call("organizations/repositories")
   end
 
   def organization_repositories
-    self.api_call("organizations/#{@organization}/repositories")
+    Apicall.call("organizations/#{@organization}/repositories")
   end
 
   def user_repositories
-    self.api_call("repos/show/#{@user}")
+    Apicall.call("repos/show/#{@user}")
   end
 
   def repositories
@@ -142,7 +121,7 @@ class Github
   end
 
   def repository_issues(owner, repository, issues_state = "open")
-    issues = api_call("issues/list/#{owner}/#{repository}/#{issues_state}")['issues']
+    issues = Apicall.call("issues/list/#{owner}/#{repository}/#{issues_state}")['issues']
     issues_r = Array.new
     issues.each do |issue|
       issues_r << {:title => issue["title"], :user => issue["user"], :labels => issue["labels"], :updated_at => issue["updated_at"]}
