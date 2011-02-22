@@ -38,3 +38,4 @@ gem "thin"
 gem "pg", :group => [:production]
 gem "yard"
 gem "devise"
+gem "rails_config"
