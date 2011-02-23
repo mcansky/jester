@@ -5,3 +5,4 @@ tmp/**/*
 
 /config/settings/development.yml
 /config/settings/test.yml
+/public/stylesheets/style.css
