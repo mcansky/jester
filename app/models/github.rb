@@ -6,7 +6,7 @@ module Apicall
     raise ArgumentError, "user and/or token are not present", nil if (!user || !token)
     begin
       github_payload = "/api/v2/json/#{request}"
-      #Rails.logger.info(github_payload)
+      Rails.logger.info("Github API call : #{github_payload}")
       host = "github.com"
       port = "443"
 
@@ -15,6 +15,7 @@ module Apicall
       httpd = Net::HTTP.new(host, port)
       httpd.use_ssl = true
       response = httpd.request(req)
+      Rails.logger.info("\treponse : #{response.code}")
       json_res = JSON.parse(response.body)
       return json_res
     rescue
@@ -74,12 +75,14 @@ class Issue
   def get_comments
     comments_raw = Apicall.call("issues/comments/#{user}/#{@repository}/#{number}")["comments"]
     comments = Array.new
-    return nil if !comments_raw && (comments_raw.count < 1)
-    comments_raw.each do |comment|
-      comments << Comment.new({:issue_number => number, :repository => @repository, :repository_owner => @repository_owner,
-        :user => user, :udpated_at => comment["updated_at"], :id => comment["id"], :body => comment['body']})
+    if comments_raw && (comments_raw.count > 1)
+      comments_raw.each do |comment|
+        comments << Comment.new({:issue_number => number, :repository => @repository, :repository_owner => @repository_owner,
+          :user => user, :udpated_at => comment["updated_at"], :id => comment["id"], :body => comment['body']})
+      end
+      return comments
     end
-    return comments
+    return nil
   end
 
 end

@@ -7,7 +7,7 @@
         - repo_p.open_issues.each do |issue|
           %div.issue
             %h3
-              = "##{issue.number}"
+              %span.issue_number= "#{issue.number}"
               = link_to issue.title, issue.url
               = issue.user
               = issue.updated_at.strftime("%d/%m/%Y %H:%M")
