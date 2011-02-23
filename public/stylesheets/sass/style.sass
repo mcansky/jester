@@ -1,11 +1,53 @@
 $base_font: 'Molengo', 'Adobe Caslon Pro', 'Hoefler Text', Garamond, serif
-$title_font: 'Myriad Pro', Corbel, 'Helvetica Neue', Helvetica, 'Lucida Grande', Verdana, sans-serif
+$title_font: Cuprum, 'Myriad Pro', Corbel, 'Helvetica Neue', Helvetica, 'Lucida Grande', Verdana, sans-serif
+$color: #2B0D1A
+$arbousier_color: #C93653
 
 *
-	font-family: $base_font
+  font-family: $base_font
 
 h1, h2, h3, h4, h5
-	font-family: $title_font
+  font-family: $title_font
+
+h2 a
+  font-family: $title_font
+  text-decoration: none
+
+h2 a
+  color: $color
+
+h3, h3 a
+  color: #fff
+  font-family: $base_font
+  font-weight: normal
+  font-style: italic
+  font-size: 10pt
+  margin-bottom: 5px
+
+h3 a  
+  font-size: 11pt
+  color: $arbousier_color
+  text-decoration: none
 
 .clear
-	clear: both
+  clear: both
+
+body
+  background: #333
+
+div.repo
+  background: #555
+  -moz-border-radius: 15px
+  border-radius: 15px
+  padding: 10px
+  margin-bottom: 10px
+  margin-top: 5px
+
+div.issue
+  background: #888
+  -moz-border-radius: 15px
+  border-radius: 15px
+  padding: 10px
+  margin-bottom: 10px
+  margin-top: 5px
+  

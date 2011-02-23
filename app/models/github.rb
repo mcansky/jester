@@ -6,6 +6,7 @@ module Apicall
     raise ArgumentError, "user and/or token are not present", nil if (!user || !token)
     begin
       github_payload = "/api/v2/json/#{request}"
+      #Rails.logger.info(github_payload)
       host = "github.com"
       port = "443"
 
@@ -33,15 +34,15 @@ class Repository
   attr_reader :name, :owner, :url
 
   def open_issues
-    @open_issues = get_issues("open") unless @open_issues
+    self.get_issues("open") unless @open_issues
     return @open_issues
   end
 
   def get_issues(state)
     issues = Apicall.call("issues/list/#{owner}/#{name}/#{state}")['issues']
-    issues_r = Array.new
+    @open_issues = Array.new
     issues.each do |issue|
-      Issue.new({:title => issue["title"], :user => issue["user"],
+      @open_issues << Issue.new({:title => issue["title"], :user => issue["user"],
         :labels => issue["labels"], :updated_at => issue["updated_at"],
         :number => issue["number"], :state => issue["state"],
         :repository => name, :repository_owner => owner})
@@ -54,12 +55,14 @@ class Issue
     @title = data[:title]
     @user = data[:user]
     @labels = data[:labels]
-    @updated_at = data[:updated_at]
+    @updated_at = DateTime.parse(data[:updated_at])
     @number = data[:number]
     @state = data[:state]
     @repository = data[:repository]
     @repository_owner = data[:repository_owner]
   end
+  
+  attr_reader :title, :user, :labels, :updated_at, :number, :state
 
   def url
     return "https://github.com/#{@repository_owner}/#{@repository}/issues/#issue/#{@number}"
