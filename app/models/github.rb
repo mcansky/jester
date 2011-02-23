@@ -60,12 +60,33 @@ class Issue
     @state = data[:state]
     @repository = data[:repository]
     @repository_owner = data[:repository_owner]
+    @comments = nil
   end
   
   attr_reader :title, :user, :labels, :updated_at, :number, :state
 
   def url
     return "https://github.com/#{@repository_owner}/#{@repository}/issues/#issue/#{@number}"
+  end
+
+  def get_comments
+    comments_raw = Apicall.call("issues/comments/#{user}/#{repository}/#{number}")
+  end
+
+  def labels_to_s
+    return labels.join(" ")
+  end
+end
+
+class Comment
+  def initialize(data)
+    @issue_number = data[:issue_number]
+    @repository = data[:repository]
+    @repository_owner = data[:repository_owner]
+    @updated_at = data[:updated_at]
+    @user = data[:user]
+    @id = data[:id]
+    @body = data[:body]
   end
 end
 
