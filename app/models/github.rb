@@ -41,11 +41,13 @@ class Repository
   def get_issues(state)
     issues = Apicall.call("issues/list/#{owner}/#{name}/#{state}")['issues']
     @open_issues = Array.new
-    issues.each do |issue|
-      @open_issues << Issue.new({:title => issue["title"], :user => issue["user"],
-        :labels => issue["labels"], :updated_at => issue["updated_at"],
-        :number => issue["number"], :state => issue["state"],
-        :repository => name, :repository_owner => owner})
+    if (issues && (issues.count > 0))
+      issues.each do |issue|
+        @open_issues << Issue.new({:title => issue["title"], :user => issue["user"],
+          :labels => issue["labels"], :updated_at => issue["updated_at"],
+          :number => issue["number"], :state => issue["state"],
+          :repository => name, :repository_owner => owner})
+      end
     end
   end
 end
@@ -60,22 +62,26 @@ class Issue
     @state = data[:state]
     @repository = data[:repository]
     @repository_owner = data[:repository_owner]
-    @comments = nil
+    @comments = get_comments || nil
   end
   
-  attr_reader :title, :user, :labels, :updated_at, :number, :state
+  attr_reader :title, :user, :labels, :updated_at, :number, :state, :comments
 
   def url
     return "https://github.com/#{@repository_owner}/#{@repository}/issues/#issue/#{@number}"
   end
 
   def get_comments
-    comments_raw = Apicall.call("issues/comments/#{user}/#{repository}/#{number}")
+    comments_raw = Apicall.call("issues/comments/#{user}/#{@repository}/#{number}")["comments"]
+    comments = Array.new
+    return nil if !comments_raw && (comments_raw.count < 1)
+    comments_raw.each do |comment|
+      comments << Comment.new({:issue_number => number, :repository => @repository, :repository_owner => @repository_owner,
+        :user => user, :udpated_at => comment["updated_at"], :id => comment["id"], :body => comment['body']})
+    end
+    return comments
   end
 
-  def labels_to_s
-    return labels.join(" ")
-  end
 end
 
 class Comment
@@ -88,6 +94,7 @@ class Comment
     @id = data[:id]
     @body = data[:body]
   end
+  attr_reader :user, :id, :body, :updated_at
 end
 
 class Github

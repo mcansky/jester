@@ -13,3 +13,10 @@
               = issue.updated_at.strftime("%d/%m/%Y %H:%M")
               - issue.labels.each do |label|
                 %span.labels= link_to label, "https://github.com/#{repo_p.owner}/#{repo_p.name}/issues/labels/#{label}"
+            %div.comments
+              - if issue.comments
+                - issue.comments.each do |comment|
+                  %div.comment
+                    %p
+                      %span.comment_user= comment.user + " says : "
+                      =comment.body
