@@ -4,21 +4,13 @@ class ApplicationController < ActionController::Base
     @github = nil
     @github = Rails.cache.read :github
     if !@github
-      @github = Github.new
-      @github.repositories
-      @github.repositories.keys.each do |repo|
-        @github.repositories[repo].open_issues
-      end
+      @github = Github.last
       Rails.cache.write(:github, @github)
     end
   end
 
   def update
-    @github = Github.new
-    @github.repositories
-    @github.repositories.keys.each do |repo|
-      @github.repositories[repo].open_issues
-    end
+    @github = Github.last
     Rails.cache.write(:github, @github)
     redirect_to :index
   end

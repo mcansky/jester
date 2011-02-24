@@ -1,16 +1,15 @@
 %div.grid_16
-  - @github.repositories.keys.each do |repo|
-    - repo_p = @github.repositories[repo]
-    - if repo_p.open_issues.count > 0
+  - @github.repositories.each do |repo_p|
+    - if repo_p.issues.count > 0
       %div.repo
-        %h2= link_to repo, repo_p.url
-        - repo_p.open_issues.each do |issue|
+        %h2= link_to repo_p.name, repo_p.url
+        - repo_p.issues.each do |issue|
           %div.issue
             %h3
               %span.issue_number= "#{issue.number}"
               = link_to issue.title, issue.url
               = issue.user
-              = issue.updated_at.strftime("%d/%m/%Y %H:%M")
+              = issue.edited_at.strftime("%d/%m/%Y %H:%M")
               - issue.labels.each do |label|
                 %span.labels= link_to label, "https://github.com/#{repo_p.owner}/#{repo_p.name}/issues/labels/#{label}"
             %div.comments

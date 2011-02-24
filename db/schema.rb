@@ -10,7 +10,48 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110222203329) do
+ActiveRecord::Schema.define(:version => 20110224224759) do
+
+  create_table "comments", :force => true do |t|
+    t.integer  "issue_id"
+    t.datetime "edited_at"
+    t.integer  "cid"
+    t.string   "user"
+    t.text     "body"
+    t.string   "hash"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "githubs", :force => true do |t|
+    t.string   "organization"
+    t.string   "token"
+    t.string   "user"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "issues", :force => true do |t|
+    t.string   "title"
+    t.string   "user"
+    t.text     "labels"
+    t.datetime "edited_at"
+    t.string   "state"
+    t.integer  "repository_id"
+    t.string   "hash"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "number"
+  end
+
+  create_table "repositories", :force => true do |t|
+    t.string   "name"
+    t.string   "owner"
+    t.integer  "github_id"
+    t.string   "hash"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", :force => true do |t|
     t.string   "email",                               :default => "", :null => false

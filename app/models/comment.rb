@@ -1,18 +1,9 @@
-class Comment < Ohm::Model
-  reference :issue, Issue
-  attribute :updated_at # need DateTime.parse !
-  attribute :id # need to_i !
-  attribute :user
-  attribute :body
-  attribute :hash
+require 'digest/sha1'
+class Comment < ActiveRecord::Base
+  belongs_to :issue
 
-  index :hash
-
-  def initialize(data)
-    self.updated_at = data[:updated_at]
-    self.user = data[:user]
-    self.id = data[:id]
-    self.body = data[:body]
+  def url
+    return issue.url
   end
 
   def repository
