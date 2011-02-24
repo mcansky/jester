@@ -62,19 +62,18 @@ module GithubApi
   end
 
   def self.pull_comments(issue)
-    comments_raw = self.call("issues/comments/#{issue.repository.user}/#{issue.repository.name}/#{issue.number}")["comments"]
+    comments_raw = self.call("issues/comments/#{issue.repository.owner}/#{issue.repository.name}/#{issue.number}")["comments"]
     comments_raw.each do |comment|
-      hash = Digest::SHA1.hexdigest("#{issue.repository.user}-#{issue.repository.name}-#{issue.number}-#{comment["id"]}")
+      hash = Digest::SHA1.hexdigest("#{issue.repository.owner}-#{issue.repository.name}-#{issue.number}-#{comment["id"]}")
       if (!issue.comments.find_by_hash(hash))
-        c_comment = Comment.new(:issue_number => number,
-          :repository => issue.repository,
-          :user => user, :edited_at => comment["updated_at"],
-          :eid => comment["id"], :body => comment['body'],
+        c_comment = Comment.new(:issue => issue,
+          :user => comment["user"], :edited_at => comment["updated_at"],
+          :cid => comment["id"], :body => comment['body'],
           :hash => hash)
         c_comment.save
-        Rails.logger.info("[GITHUB] Comment #{issue.repository.user}/#{issue.repository.name}-##{issue.number} ##{comment["id"]} added")
+        Rails.logger.info("[GITHUB] Comment #{issue.repository.owner}/#{issue.repository.name}-##{issue.number} ##{comment["id"]} added")
       else
-        Rails.logger.info("[GITHUB] Comment #{issue.repository.user}/#{issue.repository.name}-##{issue.number} ##{comment["id"]} already in")
+        Rails.logger.info("[GITHUB] Comment #{issue.repository.owner}/#{issue.repository.name}-##{issue.number} ##{comment["id"]} already in")
       end
     end
   end

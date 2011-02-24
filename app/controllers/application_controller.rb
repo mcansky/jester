@@ -1,12 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   def index
-    @github = nil
-    @github = Rails.cache.read :github
-    if !@github
-      @github = Github.last
-      Rails.cache.write(:github, @github)
-    end
+    @github = Github.last
   end
 
   def update
