@@ -21,4 +21,4 @@ Note : after the first complete pull, hashes are used to check if something is a
 
 ### Licence
 
-MIT, see LICENCE file.
+MIT, see LICENSE file.
